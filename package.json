@@ -1,0 +1,13 @@
+{
+  "name": "china-futures-chain",
+  "version": "1.0.0",
+  "description": "China Commodity Futures Visual Chain & Fundamental Research Terminal (Ferrous, Non-Ferrous, Precious, Energy & Chemicals, Agriculture)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}

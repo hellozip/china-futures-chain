@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中国期货全产业链可视链 · 基本面分析与空多研判终端</title>
+  <link rel="stylesheet" href="css/styles.css?v=3" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Header & Navigation -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="brand" id="brandReset" title="返回全产业链视图">
+          <div class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="24" height="24" fill="none">
+              <circle cx="6.5" cy="16" r="3.4" fill="#f97316" />
+              <circle cx="16" cy="7.5" r="3.4" fill="#38bdf8" />
+              <circle cx="16" cy="24.5" r="3.4" fill="#a78bfa" />
+              <circle cx="25.5" cy="16" r="3.4" fill="#f43f5e" />
+              <path d="M9.6 14L13.1 9.8M9.6 18L13.1 22.2M18.9 9.8L22.4 14M18.9 22.2L22.4 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.88" />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>中国期货可视链终端</h1>
+            <span class="brand-sub">CHINA COMMODITY FUTURES CHAIN · 5 SECTORS · 30 CORE CONTRACTS</span>
+          </div>
+        </div>
+
+        <nav class="main-nav" role="tablist" aria-label="主导航">
+          <button class="nav-tab active" data-view="chain" role="tab" aria-selected="true">
+            <span class="nav-dot dot-orange"></span>全景可视链
+          </button>
+          <button class="nav-tab" data-view="matrix" role="tab" aria-selected="false">
+            <span class="nav-dot dot-rose"></span>估值×驱动矩阵
+          </button>
+          <button class="nav-tab" data-view="spreads" role="tab" aria-selected="false">
+            <span class="nav-dot dot-violet"></span>利润与套利链
+          </button>
+          <button class="nav-tab" data-view="delivery" role="tab" aria-selected="false">
+            <span class="nav-dot dot-amber"></span>交割月仓单雷达
+          </button>
+          <button class="nav-tab" data-view="intel" role="tab" aria-selected="false">
+            <span class="nav-dot dot-cyan"></span>基本面资讯
+            <span class="nav-badge" id="intelCountBadge">10</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="topbar-right">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="9" cy="9" r="6"></circle>
+            <path d="M13.5 13.5L17.5 17.5" stroke-linecap="round"></path>
+          </svg>
+          <input type="text" id="globalSearch" placeholder="搜索品种、合约、板块、多空标签..." autocomplete="off" />
+          <button class="search-clear" id="searchClear" title="清除搜索" hidden>&times;</button>
+        </div>
+
+        <button class="icon-btn" id="openComposerBtn" title="录入每日产业调研或基本面研判">
+          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M10 4v12M4 10h12" stroke-linecap="round" />
+          </svg>
+          <span>录入研判</span>
+        </button>
+
+        <button class="icon-btn theme-btn" id="themeToggle" title="切换深色 / 浅色模式" aria-label="切换主题">
+          <svg class="sun-icon" viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="10" cy="10" r="3.5" />
+            <path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4" stroke-linecap="round" />
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M16.2 12.6A6.5 6.5 0 017.4 3.8a6.5 6.5 0 108.8 8.8z" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Live Commodity Ticker Strip -->
+    <div class="ticker-strip">
+      <div class="ticker-label">
+        <span class="pulse-dot"></span>
+        <span>基本面速递</span>
+      </div>
+      <div class="ticker-scroll" id="tickerContainer"></div>
+      <button class="live-pill" id="liveSyncBtn" title="点击刷新新浪期货实时行情与产业资讯">
+        <span class="live-dot" id="liveSyncDot"></span>
+        <span id="liveSyncText">本地投研快照</span>
+      </button>
+      <button class="ticker-more" id="tickerMoreBtn">全部资讯 →</button>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      <!-- VIEW 1: INTERACTIVE FUTURES CHAIN GRAPH -->
+      <section class="view-section active" id="view-chain">
+        <div class="toolbar">
+          <div class="toolbar-group">
+            <span class="toolbar-label">五大板块</span>
+            <div class="chip-group" id="sectorFilterGroup">
+              <button class="chip active" data-sector="ALL">全部板块 (30)</button>
+              <button class="chip chip-sec-ferrous" data-sector="ferrous">黑色系 (6)</button>
+              <button class="chip chip-sec-nonferrous" data-sector="nonferrous">有色系 (7)</button>
+              <button class="chip chip-sec-precious" data-sector="precious">贵金属系 (2)</button>
+              <button class="chip chip-sec-energy" data-sector="energy">能源化工系 (8)</button>
+              <button class="chip chip-sec-agri" data-sector="agri">农产品系 (7)</button>
+            </div>
+          </div>
+
+          <div class="toolbar-group">
+            <span class="toolbar-label">空多筛选</span>
+            <div class="chip-group" id="signalFilterGroup">
+              <button class="chip active" data-signal="ALL">全部方向</button>
+              <button class="chip" data-signal="bull">看多 / 偏多</button>
+              <button class="chip" data-signal="neutral">中性震荡</button>
+              <button class="chip" data-signal="bear">偏空 / 看空</button>
+            </div>
+          </div>
+
+          <div class="toolbar-group toolbar-right">
+            <div class="select-wrap">
+              <label for="tightnessFilter">交割松紧</label>
+              <select id="tightnessFilter">
+                <option value="ALL">全部状态</option>
+                <option value="tight">货源偏紧 (≥65)</option>
+                <option value="balance">紧平衡 (48-64)</option>
+                <option value="loose">偏松/过剩 (&lt;48)</option>
+              </select>
+            </div>
+
+            <div class="select-wrap">
+              <label for="sortMetric">排序</label>
+              <select id="sortMetric">
+                <option value="score">多空综合评分 (高→低)</option>
+                <option value="tightness">交割月紧缺度 (紧→松)</option>
+                <option value="basisPct">基差贴水率 (贴水→升水)</option>
+                <option value="valuation">估值安全边际 (高→低)</option>
+                <option value="liveChange">当日涨跌幅</option>
+              </select>
+            </div>
+
+            <button class="btn-subtle active" id="toggleAllEdgesBtn" title="切换显示全链路传导连线">
+              <span class="edge-indicator"></span>传导连线
+            </button>
+            <button class="btn-subtle" id="clearSelectionBtn" hidden>清除路径高亮</button>
+          </div>
+        </div>
+
+        <!-- Macro KPI Summary Strip -->
+        <div class="summary-strip" id="chainSummaryStrip"></div>
+
+        <!-- Daily Latest Automated Fundamental Judgment Banner -->
+        <section class="daily-brief-panel" id="dailyBriefPanel"></section>
+
+        <!-- Interactive Chain Stage -->
+        <div class="chain-stage-wrapper">
+          <div class="chain-hint-bar">
+            <span class="hint-badge">传导交互</span>
+            <span id="chainHintText">悬停任意品种卡片可动态高亮上下游成本/需求传导路径；点击品种可打开深度基本面分析抽屉（交割月松紧 · 供需库成本预期差五项 · 升贴水曲线 · 交互推演沙盘）。</span>
+          </div>
+
+          <div class="chain-stage" id="chainStage">
+            <svg class="chain-edges-svg" id="chainEdgesSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+
+            <div class="chain-columns">
+              <div class="chain-col" data-tier="upstream">
+                <div class="tier-header tier-upstream">
+                  <div class="tier-title-row">
+                    <span class="tier-tag">UPSTREAM · 01 上游源头</span>
+                    <h2>上游 · 矿端 / 能源 / 粮油与宏观锚</h2>
+                  </div>
+                  <p class="tier-desc">铁矿石 · 焦煤 · 氧化铝 · 碳酸锂 · 沪金 · 原油 · 甲醇 · 玉米 · 棕榈油</p>
+                  <div class="tier-meta" id="meta-upstream"></div>
+                </div>
+                <div class="node-list" id="nodes-upstream"></div>
+              </div>
+
+              <div class="chain-col" data-tier="midstream">
+                <div class="tier-header tier-midstream">
+                  <div class="tier-title-row">
+                    <span class="tier-tag">MIDSTREAM · 02 中游冶炼加工</span>
+                    <h2>中游 · 冶炼 / 炼化 / 焦化与压榨</h2>
+                  </div>
+                  <p class="tier-desc">焦炭 · 锰硅 · 沪铜 · 沪铝 · 沪锌 · 沪镍 · 沪银 · 燃料油 · PTA · 纯碱 · 豆粕</p>
+                  <div class="tier-meta" id="meta-midstream"></div>
+                </div>
+                <div class="node-list" id="nodes-midstream"></div>
+              </div>
+
+              <div class="chain-col" data-tier="downstream">
+                <div class="tier-header tier-downstream">
+                  <div class="tier-title-row">
+                    <span class="tier-tag">DOWNSTREAM · 03 下游终端</span>
+                    <h2>下游 · 成材 / 建材 / 化工制品与消费养殖</h2>
+                  </div>
+                  <p class="tier-desc">螺纹钢 · 热卷 · 不锈钢 · 聚丙烯 · 玻璃 · 橡胶 · 豆油 · 生猪 · 白糖 · 棉花</p>
+                  <div class="tier-meta" id="meta-downstream"></div>
+                </div>
+                <div class="node-list" id="nodes-downstream"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: VALUATION x DRIVE MATRIX & FUNDAMENTAL TABLE -->
+      <section class="view-section" id="view-matrix">
+        <div class="section-head">
+          <div>
+            <h2>基本面估值 × 驱动四象限与全品种横向矩阵</h2>
+            <p class="section-sub">以「驱动强度（供需/库存/预期差）」与「估值安全边际（成本利润/基差贴水）」双轴精准定位高胜率多空标的</p>
+          </div>
+          <div class="chip-group" id="matrixSectorFilter">
+            <button class="chip active" data-sector="ALL">全部板块</button>
+            <button class="chip" data-sector="ferrous">黑色系</button>
+            <button class="chip" data-sector="nonferrous">有色系</button>
+            <button class="chip" data-sector="precious">贵金属系</button>
+            <button class="chip" data-sector="energy">能源化工系</button>
+            <button class="chip" data-sector="agri">农产品系</button>
+          </div>
+        </div>
+
+        <div class="matrix-charts-top">
+          <div class="panel-card">
+            <div class="panel-card-head">
+              <h3>估值安全边际 × 基本面驱动 四象限散点图（点击节点打开深度研判）</h3>
+              <span class="panel-badge">红多 · 绿空 · 5色板块</span>
+            </div>
+            <div class="chart-box" id="quadrantChart"></div>
+          </div>
+
+          <div class="matrix-right-stack">
+            <div class="panel-card">
+              <div class="panel-card-head">
+                <h3>五大板块平均多空评分 vs 交割月紧缺度</h3>
+                <span class="panel-badge">0-100 量化均分</span>
+              </div>
+              <div class="chart-box compact-chart" id="sectorStrengthChart"></div>
+            </div>
+            <div class="panel-card">
+              <div class="panel-card-head">
+                <h3>期现基差率极值排行（深贴水 vs 深升水）</h3>
+                <span class="panel-badge">正值=期货贴水 / 负值=升水</span>
+              </div>
+              <div class="chart-box compact-chart" id="basisRankChart"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card table-card">
+          <div class="table-wrap">
+            <table class="data-table" id="matrixTable">
+              <thead>
+                <tr>
+                  <th data-sort="name" class="sortable">品种 / 主力合约</th>
+                  <th data-sort="sector" class="sortable">板块</th>
+                  <th data-sort="price" class="num sortable">最新价 / 涨跌</th>
+                  <th data-sort="totalScore" class="num sortable">多空研判 / 评分</th>
+                  <th data-sort="tightness" class="num sortable">交割月松紧</th>
+                  <th data-sort="supply" class="num sortable">供给</th>
+                  <th data-sort="demand" class="num sortable">需求</th>
+                  <th data-sort="inventory" class="num sortable">库存</th>
+                  <th data-sort="costMargin" class="num sortable">成本利润</th>
+                  <th data-sort="expectationGap" class="num sortable">预期差</th>
+                  <th data-sort="basisPct" class="num sortable">基差 / 升贴水</th>
+                  <th>象限定位 & 核心交易策略</th>
+                </tr>
+              </thead>
+              <tbody id="matrixTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: INDUSTRY CHAIN MARGINS & CROSS-COMMODITY SPREADS -->
+      <section class="view-section" id="view-spreads">
+        <div class="section-head">
+          <div>
+            <h2>产业链核心加工利润与跨品种套利雷达</h2>
+            <p class="section-sub">追踪煤焦钢利润、铝-氧化铝利润、金银比、MTO利润、玻璃-纯碱价差、豆棕价差与猪粮比，捕捉利润再分配机会</p>
+          </div>
+          <div class="chip-group" id="spreadSectorFilter">
+            <button class="chip active" data-sector="ALL">全部套利链</button>
+            <button class="chip" data-sector="ferrous">黑色利润链</button>
+            <button class="chip" data-sector="nonferrous">有色冶炼链</button>
+            <button class="chip" data-sector="precious">贵金属比价</button>
+            <button class="chip" data-sector="energy">能化建材链</button>
+            <button class="chip" data-sector="agri">油脂饲料养殖链</button>
+          </div>
+        </div>
+
+        <div class="spreads-grid" id="spreadsGrid"></div>
+      </section>
+
+      <!-- VIEW 4: DELIVERY MONTH & WAREHOUSE RECEIPTS RISK RADAR -->
+      <section class="view-section" id="view-delivery">
+        <div class="section-head">
+          <div>
+            <h2>临近交割月货源松紧与仓单/虚实盘比预警雷达</h2>
+            <p class="section-sub">商品期货分析第一步：识别交割月份可交割货源偏紧还是偏松，锁定低仓单高贴水逼仓风险与高仓单深升水交割压制</p>
+          </div>
+          <div class="chip-group" id="deliveryRiskFilter">
+            <button class="chip active" data-risk="ALL">全部品种 (30)</button>
+            <button class="chip" data-risk="tight">极紧 / 偏紧 (多头占优)</button>
+            <button class="chip" data-risk="balance">紧平衡</button>
+            <button class="chip" data-risk="loose">偏松 / 过剩 (交割承压)</button>
+          </div>
+        </div>
+
+        <div class="summary-strip" id="deliverySummaryStrip"></div>
+
+        <div class="panel-card table-card">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>品种 / 交割合约</th>
+                  <th>板块</th>
+                  <th class="num">交割紧缺指数</th>
+                  <th>货源松紧定性</th>
+                  <th class="num">注册仓单</th>
+                  <th class="num">虚实盘比</th>
+                  <th>逼仓/交割风险</th>
+                  <th>期现基差与月差结构</th>
+                  <th>交割月核心逻辑与可交割货源评估</th>
+                </tr>
+              </thead>
+              <tbody id="deliveryTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: DAILY FUNDAMENTAL INTEL & RESEARCH NOTES -->
+      <section class="view-section" id="view-intel">
+        <div class="section-head">
+          <div>
+            <h2>每日大宗商品基本面资讯与自选研判库</h2>
+            <p class="section-sub">追踪矿山发运、装置检修、库存周报、产区天气、进出口关税及仓单异动，支持自定义录入笔记与 JSON 导出</p>
+          </div>
+          <div class="news-actions">
+            <button class="btn-subtle" id="refreshLiveNewsBtn">↻ 同步实时资讯</button>
+            <button class="btn-primary" id="intelAddBtn">+ 录入基本面研判</button>
+            <button class="btn-subtle" id="exportDataBtn">导出 JSON 备份</button>
+          </div>
+        </div>
+
+        <div class="toolbar compact">
+          <div class="chip-group" id="intelSectorFilter">
+            <button class="chip active" data-sector="ALL">全部板块</button>
+            <button class="chip" data-sector="ferrous">黑色系</button>
+            <button class="chip" data-sector="nonferrous">有色系</button>
+            <button class="chip" data-sector="precious">贵金属系</button>
+            <button class="chip" data-sector="energy">能源化工系</button>
+            <button class="chip" data-sector="agri">农产品系</button>
+          </div>
+          <div class="chip-group" id="intelSentimentFilter">
+            <button class="chip active" data-sentiment="ALL">全部方向</button>
+            <button class="chip" data-sentiment="bullish">利多</button>
+            <button class="chip" data-sentiment="neutral">中性</button>
+            <button class="chip" data-sentiment="bearish">利空</button>
+          </div>
+        </div>
+
+        <div class="news-layout">
+          <div class="news-feed" id="intelFeed"></div>
+          <aside class="news-sidebar">
+            <div class="panel-card">
+              <h3>今日高频催化品种排行</h3>
+              <div id="hotContractsList" class="hot-topics"></div>
+            </div>
+            <div class="panel-card">
+              <h3>基本面五项分析框架说明</h3>
+              <ul class="framework-note-list">
+                <li><strong>先判交割月松紧：</strong>仓单、虚实盘比与可交割货源决定近月弹性边界。</li>
+                <li><strong>供给 + 需求：</strong>开工/进口/检修天气 vs 表观消费/订单/淡旺季。</li>
+                <li><strong>库存同比：</strong>绝对水位与去累库斜率对照近5年同期。</li>
+                <li><strong>成本利润：</strong>原料、海运费、汇率与利润决定增减产与补库动力。</li>
+                <li><strong>预期差 + 升贴水：</strong>区分冲击近月还是远月，结合Back/Contango回归路径输出空多结论。</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>中国期货全产业链可视链终端 · 覆盖黑色 / 有色 / 贵金属 / 能源化工 / 农产品五大板块共 30 个主力合约（中国期货红多绿空配色标准）</span>
+      <span>基本面研判与量化评分仅供投研参考，期货交易具杠杆风险，不构成直接投资建议</span>
+    </footer>
+  </div>
+
+  <!-- Contract Deep-Dive Full-Screen Slide-Over Drawer (6 Dimensions) -->
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="contract-drawer" id="contractDrawer" aria-hidden="true">
+    <div class="drawer-header" id="drawerHeader"></div>
+
+    <div class="drawer-tabs" role="tablist">
+      <button class="drawer-tab active" data-tab="overview">1. 多空总评与雷达</button>
+      <button class="drawer-tab" data-tab="pillars">2. 供需库成本预期差五项</button>
+      <button class="drawer-tab" data-tab="basis">3. 升贴水与期限结构</button>
+      <button class="drawer-tab" data-tab="extended">4. 仓单·宏观·产业链传导</button>
+      <button class="drawer-tab" data-tab="simulator">5. 交互推演沙盘</button>
+      <button class="drawer-tab" data-tab="intel">6. 相关产业资讯</button>
+    </div>
+
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <!-- Add Fundamental Note / Intel Modal -->
+  <div class="modal-backdrop" id="composerBackdrop" hidden></div>
+  <div class="modal" id="composerModal" role="dialog" aria-modal="true" aria-labelledby="composerTitle" hidden>
+    <div class="modal-head">
+      <h3 id="composerTitle">录入基本面快讯 / 自选调研研判</h3>
+      <button class="modal-close" id="closeComposerBtn" aria-label="关闭">&times;</button>
+    </div>
+    <form id="intelComposerForm" class="modal-form">
+      <div class="form-row">
+        <label for="intelTitleInput">事件 / 研判标题 *</label>
+        <input id="intelTitleInput" type="text" required placeholder="例如：某大型氧化铝厂宣布12月焙烧炉例行检修15天，现货再涨50元" />
+      </div>
+      <div class="form-grid-3">
+        <div class="form-row">
+          <label for="intelSectorInput">所属板块</label>
+          <select id="intelSectorInput">
+            <option value="ferrous">黑色系</option>
+            <option value="nonferrous">有色系</option>
+            <option value="precious">贵金属系</option>
+            <option value="energy">能源化工系</option>
+            <option value="agri">农产品系</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="intelSentimentInput">多空方向</label>
+          <select id="intelSentimentInput">
+            <option value="bullish">利多</option>
+            <option value="neutral">中性</option>
+            <option value="bearish">利空</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="intelSourceInput">来源</label>
+          <input id="intelSourceInput" type="text" value="自选投研调研" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="intelContractsInput">关联品种代码（可选，逗号分隔，如 rb,i,jm,ao,p）</label>
+        <input id="intelContractsInput" type="text" placeholder="ao, al, cu" />
+      </div>
+      <div class="form-row">
+        <label for="intelSummaryInput">基本面逻辑与传导影响 *</label>
+        <textarea id="intelSummaryInput" rows="3" required placeholder="输入对供给、需求、库存、利润、预期差或近远月升贴水的具体影响..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-subtle" id="cancelComposerBtn">取消</button>
+        <button type="submit" class="btn-primary">保存并发布到资讯流</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Scripts (works seamlessly via both file:// and http://localhost:3000) -->
+  <script src="js/data-ferrous-nonferrous.js?v=3"></script>
+  <script src="js/data-energy-agri.js?v=3"></script>
+  <script src="js/scoring-engine.js?v=3"></script>
+  <script src="js/charts.js?v=3"></script>
+  <script src="js/chain-graph.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
+</body>
+</html>
