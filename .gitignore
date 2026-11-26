@@ -2,3 +2,6 @@ node_modules/
 .DS_Store
 *.log
 .env
+exports/
+_live_*.json
+_poster_*.html

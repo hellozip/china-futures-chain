@@ -1365,7 +1365,13 @@
       }
     });
 
-    // Composer & Live Sync & Export
+    // Composer & Share Poster & Live Sync & Export
+    const shareBtn = document.getElementById("sharePosterBtn");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", () => {
+        if (window.FuturesSharePoster) window.FuturesSharePoster.generateAndDownload();
+      });
+    }
     document.getElementById("openComposerBtn").addEventListener("click", () => openComposer());
     document.getElementById("intelAddBtn").addEventListener("click", () => openComposer());
     document.getElementById("closeComposerBtn").addEventListener("click", closeComposer);

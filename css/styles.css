@@ -185,6 +185,13 @@ button { cursor: pointer; }
   transition: all 0.18s ease; white-space: nowrap;
 }
 .icon-btn:hover { border-color: var(--border-strong); background: var(--bg-surface-3); }
+.share-btn {
+  border-color: rgba(244, 63, 94, 0.38);
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.16), rgba(56, 189, 248, 0.14));
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.share-btn:hover { border-color: var(--bull); }
 .theme-btn { padding: 7px 9px; }
 [data-theme="dark"] .moon-icon { display: none; }
 [data-theme="light"] .sun-icon { display: none; }
