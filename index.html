@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>中国期货全产业链可视链 · 基本面分析与空多研判终端</title>
-  <link rel="stylesheet" href="css/styles.css?v=3" />
+  <link rel="stylesheet" href="css/styles.css?v=5" />
 </head>
 <body>
   <div class="app-shell">
@@ -129,20 +129,26 @@
             </div>
 
             <div class="select-wrap">
-              <label for="sortMetric">排序</label>
+              <label for="sortMetric">高亮点</label>
               <select id="sortMetric">
-                <option value="score">多空综合评分 (高→低)</option>
-                <option value="tightness">交割月紧缺度 (紧→松)</option>
-                <option value="basisPct">基差贴水率 (贴水→升水)</option>
-                <option value="valuation">估值安全边际 (高→低)</option>
-                <option value="liveChange">当日涨跌幅</option>
+                <option value="score">多空评分强度</option>
+                <option value="tightness">交割月紧缺度</option>
+                <option value="basisPct">期现基差贴水</option>
+                <option value="valuation">估值安全边际</option>
+                <option value="liveChange">当日涨跌动能</option>
               </select>
             </div>
 
-            <button class="btn-subtle active" id="toggleAllEdgesBtn" title="切换显示全链路传导连线">
-              <span class="edge-indicator"></span>传导连线
+            <div class="segmented-control" id="chainLayoutSwitch" title="切换产业链可视形态">
+              <button class="seg-btn active" data-layout="constellation">✦ 全景流光链网</button>
+              <button class="seg-btn" data-layout="force">◎ 引力星云链</button>
+              <button class="seg-btn" data-layout="ribbons">≋ 五脉串联图</button>
+            </div>
+
+            <button class="btn-subtle active" id="toggleAllEdgesBtn" title="切换显示全网跨板块传导连线">
+              <span class="edge-indicator"></span>跨链桥接
             </button>
-            <button class="btn-subtle" id="clearSelectionBtn" hidden>清除路径高亮</button>
+            <button class="btn-subtle" id="clearSelectionBtn" hidden>清除聚焦</button>
           </div>
         </div>
 
@@ -152,54 +158,45 @@
         <!-- Daily Latest Automated Fundamental Judgment Banner -->
         <section class="daily-brief-panel" id="dailyBriefPanel"></section>
 
-        <!-- Interactive Chain Stage -->
+        <!-- Interactive Organic Futures Chain Stage -->
         <div class="chain-stage-wrapper">
           <div class="chain-hint-bar">
-            <span class="hint-badge">传导交互</span>
-            <span id="chainHintText">悬停任意品种卡片可动态高亮上下游成本/需求传导路径；点击品种可打开深度基本面分析抽屉（交割月松紧 · 供需库成本预期差五项 · 升贴水曲线 · 交互推演沙盘）。</span>
+            <span class="hint-badge">灵动链网</span>
+            <span id="chainHintText">悬停节点可追踪多级上下游价格/利润传导链；任意节点支持鼠标自由拖拽，点击打开 6 维基本面深度研判与推演沙盘；选择单一板块可自动展开专属脉络大图。</span>
           </div>
 
-          <div class="chain-stage" id="chainStage">
-            <svg class="chain-edges-svg" id="chainEdgesSvg" xmlns="http://www.w3.org/2000/svg"></svg>
-
-            <div class="chain-columns">
-              <div class="chain-col" data-tier="upstream">
-                <div class="tier-header tier-upstream">
-                  <div class="tier-title-row">
-                    <span class="tier-tag">UPSTREAM · 01 上游源头</span>
-                    <h2>上游 · 矿端 / 能源 / 粮油与宏观锚</h2>
-                  </div>
-                  <p class="tier-desc">铁矿石 · 焦煤 · 氧化铝 · 碳酸锂 · 沪金 · 原油 · 甲醇 · 玉米 · 棕榈油</p>
-                  <div class="tier-meta" id="meta-upstream"></div>
-                </div>
-                <div class="node-list" id="nodes-upstream"></div>
-              </div>
-
-              <div class="chain-col" data-tier="midstream">
-                <div class="tier-header tier-midstream">
-                  <div class="tier-title-row">
-                    <span class="tier-tag">MIDSTREAM · 02 中游冶炼加工</span>
-                    <h2>中游 · 冶炼 / 炼化 / 焦化与压榨</h2>
-                  </div>
-                  <p class="tier-desc">焦炭 · 锰硅 · 沪铜 · 沪铝 · 沪锌 · 沪镍 · 沪银 · 燃料油 · PTA · 纯碱 · 豆粕</p>
-                  <div class="tier-meta" id="meta-midstream"></div>
-                </div>
-                <div class="node-list" id="nodes-midstream"></div>
-              </div>
-
-              <div class="chain-col" data-tier="downstream">
-                <div class="tier-header tier-downstream">
-                  <div class="tier-title-row">
-                    <span class="tier-tag">DOWNSTREAM · 03 下游终端</span>
-                    <h2>下游 · 成材 / 建材 / 化工制品与消费养殖</h2>
-                  </div>
-                  <p class="tier-desc">螺纹钢 · 热卷 · 不锈钢 · 聚丙烯 · 玻璃 · 橡胶 · 豆油 · 生猪 · 白糖 · 棉花</p>
-                  <div class="tier-meta" id="meta-downstream"></div>
-                </div>
-                <div class="node-list" id="nodes-downstream"></div>
+          <!-- Canvas Mode: Organic Constellation & Live Force Physics -->
+          <div class="chain-canvas-shell" id="chainCanvasShell">
+            <div class="chain-viewport" id="chainViewport">
+              <div class="chain-world" id="chainWorld">
+                <svg class="chain-backdrop-svg" id="chainBackdropSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+                <svg class="chain-edges-svg" id="chainEdgesSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+                <div class="chain-nodes-layer" id="chainNodesLayer"></div>
+                <svg class="chain-labels-svg" id="chainLabelsSvg" xmlns="http://www.w3.org/2000/svg"></svg>
               </div>
             </div>
+
+            <!-- Floating Canvas HUD Controls -->
+            <div class="canvas-hud-top-right">
+              <button class="hud-btn" id="canvasZoomIn" title="放大链图">+</button>
+              <button class="hud-btn" id="canvasZoomOut" title="缩小链图">−</button>
+              <button class="hud-btn hud-btn-wide" id="canvasResetBtn" title="自适应居中并复位布局">⟲ 复位居中</button>
+            </div>
+
+            <div class="canvas-hud-legend">
+              <span class="leg-item"><i class="leg-dot bull"></i>偏多光晕</span>
+              <span class="leg-item"><i class="leg-dot neutral"></i>震荡光晕</span>
+              <span class="leg-item"><i class="leg-dot bear"></i>偏空光晕</span>
+              <span class="leg-sep">|</span>
+              <span class="leg-item"><i class="leg-line solid"></i>板块内传导</span>
+              <span class="leg-item"><i class="leg-line dashed"></i>跨板块联动</span>
+              <span class="leg-sep">|</span>
+              <span class="leg-tip">拖拽节点可自由塑形 · 滚轮/按钮缩放</span>
+            </div>
           </div>
+
+          <!-- Mode 3: 5 Horizontal Sector Chain Ribbons -->
+          <div class="chain-ribbons-stage" id="chainRibbonsStage" hidden></div>
         </div>
       </section>
 
@@ -459,11 +456,11 @@
   </div>
 
   <!-- Scripts (works seamlessly via both file:// and http://localhost:3000) -->
-  <script src="js/data-ferrous-nonferrous.js?v=3"></script>
-  <script src="js/data-energy-agri.js?v=3"></script>
-  <script src="js/scoring-engine.js?v=3"></script>
-  <script src="js/charts.js?v=3"></script>
-  <script src="js/chain-graph.js?v=3"></script>
-  <script src="js/app.js?v=3"></script>
+  <script src="js/data-ferrous-nonferrous.js?v=5"></script>
+  <script src="js/data-energy-agri.js?v=5"></script>
+  <script src="js/scoring-engine.js?v=5"></script>
+  <script src="js/charts.js?v=5"></script>
+  <script src="js/chain-graph.js?v=5"></script>
+  <script src="js/app.js?v=5"></script>
 </body>
 </html>

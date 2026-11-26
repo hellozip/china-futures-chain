@@ -1282,9 +1282,16 @@
       window.FuturesChainGraph.setState({ sortMetric: e.target.value });
     });
     document.getElementById("toggleAllEdgesBtn").addEventListener("click", (e) => {
-      const next = !window.FuturesChainGraph.getState().showAllEdges;
+      const next = !window.FuturesChainGraph.getState().showCrossLinks;
       e.currentTarget.classList.toggle("active", next);
-      window.FuturesChainGraph.setState({ showAllEdges: next });
+      window.FuturesChainGraph.setState({ showCrossLinks: next });
+    });
+    document.querySelectorAll("#chainLayoutSwitch .seg-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#chainLayoutSwitch .seg-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        window.FuturesChainGraph.setState({ layoutMode: btn.dataset.layout });
+      });
     });
     document.getElementById("clearSelectionBtn").addEventListener("click", () => {
       window.FuturesChainGraph.clearSelection();
